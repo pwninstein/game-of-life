@@ -1,0 +1,90 @@
+﻿<Window x:Class="GameOfLife.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:GameOfLife;assembly="
+        xmlns:viewModel="clr-namespace:GameOfLife.ViewModel"
+        Title="Life" Height="450" Width="650"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <local:NegativeBooleanConverter x:Key="NegativeBooleanConverter"/>
+    </Window.Resources>
+    <Window.DataContext>
+        <viewModel:BoardViewModel/>
+    </Window.DataContext>
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <DockPanel LastChildFill="False" HorizontalAlignment="Center">
+            <Button Content="Start" Padding="20 0" Command="{Binding StartCommand}"/>
+            <Button Content="Stop" Padding="20 0" Margin="5 0 0 0" Command="{Binding StopCommand}"/>
+            <Button Content="Clear" Padding="20 0" Margin="5 0 0 0" Command="{Binding ClearCommand}"/>
+        </DockPanel>
+        <DockPanel Grid.Row="1" >
+            <DockPanel >
+                <Label Content="Generation Length:" />
+                <Label Content="{Binding GenerationLength}" />
+            </DockPanel>
+            
+            <DockPanel HorizontalAlignment="Right">
+                <Label Content="{Binding ElementName=GenerationLength, Path=Minimum}"/>
+                
+                <Slider Name="GenerationLength" Width="300" 
+                        TickFrequency="10" SmallChange="10" 
+                        IsSnapToTickEnabled="True" TickPlacement="BottomRight"
+                        Minimum="{Binding MinGenerationLength}" 
+                        Maximum="{Binding MaxGenerationLength}"  
+                        Value="{Binding GenerationLength}" 
+                        IsEnabled="{Binding IsRunning, 
+                            Converter={StaticResource NegativeBooleanConverter}}" />
+                
+                
+                <Label Content="{Binding ElementName=GenerationLength, Path=Maximum}" />
+            </DockPanel>
+            
+        </DockPanel>
+        <DockPanel LastChildFill="False" Grid.Row="2">
+            <Label Content="Current Generation:"/>
+            <Label Content="{Binding CurrentGeneration}"/>
+        </DockPanel>
+        <ItemsControl ItemsSource="{Binding Tiles}" Grid.Row="3" IsEnabled="{Binding IsRunning, Converter={StaticResource NegativeBooleanConverter}}" Margin="0 5 0 0">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Width="{Binding Width}" Height="{Binding Height}" IsChecked="{Binding IsAlive}">
+                        <CheckBox.Style>
+                            <Style TargetType="{x:Type CheckBox}">
+                                <Setter Property="Background" Value="White"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Rectangle Fill="{TemplateBinding Background}" Stroke="Black" StrokeThickness="0.2"/>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Background" Value="Green"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </CheckBox.Style>
+                    </CheckBox>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemContainerStyle>
+                <Style>
+                    <Setter Property="Canvas.Top" Value="{Binding Top}"/>
+                    <Setter Property="Canvas.Left" Value="{Binding Left}"/>
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+        </ItemsControl>
+    </Grid>
+</Window>
